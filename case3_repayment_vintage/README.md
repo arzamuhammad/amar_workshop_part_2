@@ -23,11 +23,14 @@ Langkah:
 
 > Jika kolom lama diproses dengan formula tertentu di Apps Script, salin logikanya ke fungsi baru (mis. `SNOWQUERY` + kolom turunan di sheet). Hasil akhir tetap sama, sumber pindah dari Looker ke Snowflake.
 
-## Opsi B — Streamlit in Snowflake
+## Opsi B — Streamlit in Snowflake (di Workspaces)
 `streamlit/streamlit_app.py` → dashboard payback curve, CRM vs Bank, cohort heatmap.
-Sudah dideploy sebagai **`PAYBACK_CURVE_DASHBOARD`** (schema REPAYMENT).
+Dibangun via **Streamlit in Workspaces**: buka file di Git Workspace `amar_workshop_part_2`
+→ **Run** (development app, preview privat) → **Deploy** jadi objek `PAYBACK_CURVE_DASHBOARD`
+(schema REPAYMENT). Dependency ada di `streamlit/pyproject.toml`; app berjalan di
+**compute pool** (container runtime), bukan warehouse. Detail: skill `streamlit-in-workspaces`.
 
 ## Urutan menjalankan
 1. `sql/01_setup_and_load.sql` (load dari Git Workspace) — atau data sudah di-load.
 2. `sql/02_views.sql` (unpivot + payback curve).
-3. Opsi A: setup `appscript/Code.gs`. Opsi B: buka Streamlit `PAYBACK_CURVE_DASHBOARD`.
+3. Opsi A: setup `appscript/Code.gs`. Opsi B: buka `streamlit/streamlit_app.py` di Workspace → **Run** → **Deploy** (`PAYBACK_CURVE_DASHBOARD`).

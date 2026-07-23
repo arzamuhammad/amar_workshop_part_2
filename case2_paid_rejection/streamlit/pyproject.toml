@@ -1,0 +1,11 @@
+[project]
+name = "paid_rejection_dashboard"
+version = "0.1.0"
+description = "Case 2 - Paid Rejection Dashboard (Streamlit in Snowflake, Workspaces)"
+requires-python = ">=3.11"
+dependencies = [
+    "snowflake-snowpark-python",
+    "streamlit",
+    "pandas",
+    "plotly",
+]

@@ -1,0 +1,11 @@
+[project]
+name = "payback_curve_dashboard"
+version = "0.1.0"
+description = "Case 3 - Repayment Vintage / Payback Curve (Streamlit in Snowflake, Workspaces)"
+requires-python = ">=3.11"
+dependencies = [
+    "snowflake-snowpark-python",
+    "streamlit",
+    "pandas",
+    "plotly",
+]

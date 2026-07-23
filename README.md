@@ -8,8 +8,8 @@ Database: **`AMAR_WORKSHOP_P2`** (schema per-case: `REPEAT`, `REJECTION`, `REPAY
 | Case | Topik | Snowflake features |
 |------|-------|--------------------|
 | 1 | **Repeat Alarm Forecast** | Snowflake Notebook, statsmodels **SARIMAX** (tanpa pmdarima), Linear Regression, forecast → tabel |
-| 2 | **Paid Rejection Datamart** | Open table 326 kolom, **Task** scheduler (bukan Dynamic Table), **Semantic View → Cortex Analyst**, **Streamlit** |
-| 3 | **Repayment Vintage** (Looker→Sheet) | Unpivot wide→long, **Google Apps Script + SQL API**, **Streamlit** payback curve |
+| 2 | **Paid Rejection Datamart** | Open table 326 kolom, **Task** scheduler (bukan Dynamic Table), **Semantic View → Cortex Analyst**, **Streamlit in Workspaces** |
+| 3 | **Repayment Vintage** (Looker→Sheet) | Unpivot wide→long, **Google Apps Script + SQL API**, **Streamlit in Workspaces** payback curve |
 | 4 | **Geospatial** (Digital Bank) | `ST_MAKEPOINT/ST_DISTANCE/ST_CENTROID`, **H3**, coverage + geo-fraud, **pydeck** |
 
 ## Struktur repo
@@ -99,10 +99,28 @@ USE ROLE ACCOUNTADMIN;
 > Bila memakai Git Repository object (Opsi B), path alternatifnya
 > `@AMAR_WORKSHOP_P2.PUBLIC.AMAR_WORKSHOP_REPO/branches/main/...`.
 
+## Build & deploy Streamlit app (Streamlit in Workspaces)
+App Streamlit di lab ini dibangun memakai **Streamlit in Snowflake — di Workspaces**
+(bukan classic SiS). Editing terpisah dari publishing: kode jalan di *development app*
+privat, lalu di-**Deploy** menjadi objek `STREAMLIT`.
+
+**Prasyarat:** role dgn **USAGE pada compute pool** (app jalan di *container runtime*,
+bukan warehouse), akun punya **default compute pool**, user punya **default warehouse**.
+Untuk deploy: **USAGE** pada DB+schema target + **CREATE STREAMLIT** pada schema.
+
+**Langkah:**
+1. Di Git Workspace `amar_workshop_part_2`, buka folder `caseX/streamlit/`.
+2. Buka `streamlit_app.py` → muncul action bar → **Run** (`Cmd/Ctrl+Enter`) untuk preview development app.
+   - Dependency didefinisikan di **`pyproject.toml`** (bukan `environment.yml` / tombol Packages).
+3. **Deploy** (toolbar project pane) → isi: **Location** (DB=`AMAR_WORKSHOP_P2`, schema case), **Execution** (compute pool + query warehouse `GEN2_SMALL`), **Sharing** (role penerima) → **Deploy**.
+4. Ubah kode → **Deploy** lagi untuk redeploy (menimpa app di lokasi yang sama).
+
+> File `snowflake.yml` & `.streamlit/config.toml` dibuat otomatis saat app dibuat/di-deploy dari Workspaces. Panduan lengkap: skill **`streamlit-in-workspaces`**.
+
 ## Alur tiap case
 - **Case 1:** `sql/01_setup_and_load.sql` → buka `notebooks/repeat_alarm_forecast_snowflake.ipynb` → Run all.
-- **Case 2:** `sql/01_setup_and_load.sql` → `02_analytics_and_task.sql` → `03_semantic_view.sql` → deploy `streamlit/`. Cortex Analyst: pilih `SV_PAID_REJECTION`.
-- **Case 3:** `sql/01_setup_and_load.sql` → `02_views.sql` → `streamlit/` (Opsi B) atau `appscript/Code.gs` (Opsi A). Lihat `case3.../README.md`.
+- **Case 2:** `sql/01_setup_and_load.sql` → `02_analytics_and_task.sql` → `03_semantic_view.sql` → buka `streamlit/streamlit_app.py` di Workspace → **Run** → **Deploy** (`PAID_REJECTION_DASHBOARD`, schema REJECTION). Cortex Analyst: pilih `SV_PAID_REJECTION`.
+- **Case 3:** `sql/01_setup_and_load.sql` → `02_views.sql` → `streamlit/` (Opsi B: Run + Deploy dari Workspace) atau `appscript/Code.gs` (Opsi A). Lihat `case3.../README.md`.
 - **Case 4:** `sql/01_setup_and_load.sql` → buka `notebooks/geospatial_analysis_snowflake.ipynb` → Run all. Referensi SQL: `sql/02_geospatial_queries.sql`.
 
 ## Catatan teknis penting
