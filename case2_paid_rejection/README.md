@@ -8,6 +8,7 @@ Datamart loan-origination funnel **326 kolom** (Created→Accepted→Printed→P
 - `sql/02_analytics_and_task.sql` → `VW_PAID_REJECTION` (curated, alias bersih + derived) + `MART_REJECTION_DAILY` + **Task** `TSK_REFRESH_REJECTION_MART` (cron harian, pengganti scheduled query).
 - `sql/03_semantic_view.sql` → `SV_PAID_REJECTION` untuk **Cortex Analyst** (self-serve NL).
 - `streamlit/` → dashboard funnel / reject / demografi / geo. Dibangun via **Streamlit in Workspaces**: buka `streamlit_app.py` di Git Workspace → **Run** (preview) → **Deploy** jadi `PAID_REJECTION_DASHBOARD` (schema REJECTION). Dependency di `streamlit/pyproject.toml`. App jalan di **compute pool** (container runtime).
+- `dashboard/coco_prompts.md` → **AI BI Dashboard (Cowork Dashboards 2.0)** dibangun konversasional via **CoCo** di atas `SV_PAID_REJECTION` (pelengkap Streamlit). Berisi prompt master, filter, iterasi, dan deploy. *Private preview.*
 
 ## Refresh (BUKAN Dynamic Table)
 `ALTER TASK TSK_REFRESH_REJECTION_MART RESUME;` untuk aktifkan jadwal, atau
