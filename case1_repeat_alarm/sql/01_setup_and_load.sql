@@ -8,6 +8,22 @@
      - Sudah membuat GIT WORKSPACE dari repo github.com/arzamuhammad/amar_workshop_part_2
      - Nama workspace di Snowsight = "amar_workshop_part_2"
        (kalau beda, sesuaikan path snow://workspace/... di bawah)
+   ----------------------------------------------------------------------------
+   CARA MENJALANKAN (PENTING):
+     File ini berisi BANYAK statement. Jalankan PER-STATEMENT atau "Run All" —
+     JANGAN dikirim sebagai satu panggilan API.
+       - Snowsight Worksheet/Workspace : taruh kursor di 1 statement lalu
+         Cmd/Ctrl+Enter, atau klik "Run All" (kanan atas).
+       - Snowflake CLI                 : snow sql -f 01_setup_and_load.sql
+       - SQL API / Python connector    : loop per-statement, atau set
+         ALTER SESSION SET MULTI_STATEMENT_COUNT = 0;
+     Kalau muncul error "Multiple SQL statements in a single API call are not
+     supported", artinya seluruh file terkirim sebagai satu call -> pakai salah
+     satu cara di atas.
+   ----------------------------------------------------------------------------
+   GANTI PLACEHOLDER:
+     USER$  -> username Snowflake Anda (cek: SELECT CURRENT_USER();)
+               contoh: ARDIYANMUHAMMAD
    ============================================================================ */
 
 USE ROLE ACCOUNTADMIN;
@@ -27,8 +43,9 @@ CREATE OR REPLACE STAGE REPEAT_DATA_STAGE
   ENCRYPTION = (TYPE = 'SNOWFLAKE_SSE');
 
 -- 2) Copy CSV dari Git Workspace ke stage -----------------------------------
---    Ganti USER$ sesuai user Anda bila perlu. Path 'versions/live/' = versi
---    workspace yang sedang aktif.
+--    PENTING: ganti USER$ dengan username Anda (mis. ARDIYANMUHAMMAD).
+--    Path 'versions/live/' = versi workspace yang sedang aktif.
+--    Jalankan statement ini SENDIRI (jangan bersama statement lain).
 COPY FILES INTO @REPEAT_DATA_STAGE/
 FROM 'snow://workspace/USER$.PUBLIC."amar_workshop_part_2"/versions/live/'
 FILES = (
