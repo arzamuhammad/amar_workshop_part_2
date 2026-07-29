@@ -12,6 +12,32 @@ Database: **`AMAR_WORKSHOP_P2`** (schema per-case: `REPEAT`, `REJECTION`, `REPAY
 | 3 | **Repayment Vintage** (Looker→Sheet) | Unpivot wide→long, **Google Apps Script + SQL API**, **Streamlit in Workspaces** payback curve |
 | 4 | **Geospatial** (Digital Bank) | `ST_MAKEPOINT/ST_DISTANCE/ST_CENTROID`, **H3**, coverage + geo-fraud, **pydeck** |
 
+## ⚠️ Batasan trial account (baca sebelum mulai)
+
+Kalau workshop dijalankan di **Snowflake trial account**, ada satu batasan yang berdampak besar:
+menurut [dokumentasi resmi](https://docs.snowflake.com/en/user-guide/admin-trial-account#current-limitations-for-trial-accounts),
+**External network access** (yaitu **External Access Integration / EAI**) **tidak tersedia** di trial.
+
+Akibatnya:
+
+| Hal | Trial account | Solusi |
+|---|---|---|
+| `!pip install` dari PyPI di notebook | ❌ selalu gagal (`Could not find a version that satisfies the requirement ...`) | pakai **tombol Packages** (Snowflake Anaconda channel) di **warehouse runtime** — tidak butuh internet |
+| Notebook on **Container Runtime / SPCS** + pip | ❌ tidak bisa instal paket tambahan | pakai varian **warehouse** dari notebook |
+| Apps Script → Snowflake SQL API (Case 3 Opsi A) | ⚠️ tergantung network policy akun | pakai **Opsi B (Streamlit)** bila diblokir |
+
+**Karena itu tiap notebook disediakan 2 varian.** Pilih sesuai akun Anda:
+
+| Case | ✅ Trial-safe (warehouse + Packages) | ⚠️ Non-trial (Container Runtime + pip/EAI) |
+|---|---|---|
+| 1 | `case1_repeat_alarm/notebooks/repeat_alarm_forecast_warehouse.ipynb` | `..._snowflake.ipynb` |
+| 4 | `case4_geospatial/notebooks/geospatial_analysis_warehouse.ipynb` | `geospatial_analysis_snowflake.ipynb` |
+
+> Batasan lain di trial: **Hybrid tables**, **outbound private connectivity**, **Openflow**, **Duo MFA**,
+> dan **Cortex AI Functions dibatasi ~10 kredit/hari** tanpa payment method.
+> **Streamlit in Workspaces** berjalan di *compute pool*; bila compute pool tidak tersedia di akun trial Anda,
+> gunakan Streamlit klasik (warehouse). Cek cepat: `SHOW COMPUTE POOLS;`
+
 ## Struktur repo
 ```
 amar_workshop_part_2/
