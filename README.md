@@ -129,6 +129,26 @@ ALTER NOTEBOOK <nama_notebook>
 > `pythonhosted.org` wajib ikut karena file wheel di-serve dari subdomain CDN.
 > Di **trial account** langkah ini akan gagal — pakai varian `*_warehouse.ipynb` + tombol **Packages**.
 
+### Langkah 1c — Aktifkan cross-region inference (untuk **Cortex Code / CoCo** & Cortex AI)
+Model LLM Snowflake tidak tersedia di semua region. Agar **Cortex Code (CoCo)**,
+**Cortex Analyst** (Case 2), dan Cortex AI Functions bisa jalan, izinkan inference
+di-route ke region lain:
+
+```sql
+USE ROLE ACCOUNTADMIN;
+
+ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION';
+
+-- verifikasi
+SHOW PARAMETERS LIKE 'CORTEX_ENABLED_CROSS_REGION' IN ACCOUNT;
+```
+
+> Tanpa ini, panggilan model bisa gagal dengan error *"unknown model"* / *"model not available
+> in region"*. Nilai lain yang didukung: `'AWS_US'`, `'AWS_EU'`, `'AWS_APJ'`, `'DISABLED'`
+> — pakai region-scoped bila ada kebijakan data residency.
+> Perlu diketahui: request akan diproses di region lain, jadi pastikan sesuai kebijakan
+> compliance akun Anda.
+
 ### Langkah 2 — Buat Git Workspace dari repo
 **Opsi A — via Snowsight UI (disarankan):**
 1. Snowsight → **Projects → Workspaces → `+` (dropdown) → From Git repository**
