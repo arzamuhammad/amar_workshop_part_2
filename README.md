@@ -89,6 +89,46 @@ CREATE OR REPLACE API INTEGRATION AMAR_GIT_API
 ```
 </details>
 
+### Langkah 1b — External Access Integration untuk `pip install` (opsional, **non-trial**)
+Bila akun Anda **bukan trial** dan ingin memakai varian notebook **Container Runtime** dengan
+`!pip install`, buat network rule ke host PyPI + External Access Integration berikut:
+
+```sql
+-- 1. Network rule (egress) ke host PyPI
+USE ROLE ACCOUNTADMIN;
+
+CREATE OR REPLACE NETWORK RULE pypi_network_rule
+  MODE = EGRESS
+  TYPE = HOST_PORT
+  VALUE_LIST = (
+    'pypi.org',
+    'pypi.python.org',
+    'pythonhosted.org',
+    'files.pythonhosted.org'
+  );
+
+-- 2. External Access Integration
+CREATE OR REPLACE EXTERNAL ACCESS INTEGRATION pypi_access_integration
+  ALLOWED_NETWORK_RULES = (pypi_network_rule)
+  ENABLED = TRUE
+  COMMENT = 'Allow pip install from PyPI';
+
+-- 3. Grant ke role yang akan memakainya
+GRANT USAGE ON INTEGRATION pypi_access_integration TO ROLE SYSADMIN;
+```
+
+Lalu attach ke notebook — via Snowsight (**Notebook settings → External access**) atau SQL:
+
+```sql
+ALTER NOTEBOOK <nama_notebook>
+  SET EXTERNAL_ACCESS_INTEGRATIONS = (pypi_access_integration);
+```
+
+> `NETWORK RULE` adalah objek schema-level (buat mis. di `AMAR_WORKSHOP_P2.PUBLIC`),
+> sedangkan `EXTERNAL ACCESS INTEGRATION` account-level.
+> `pythonhosted.org` wajib ikut karena file wheel di-serve dari subdomain CDN.
+> Di **trial account** langkah ini akan gagal — pakai varian `*_warehouse.ipynb` + tombol **Packages**.
+
 ### Langkah 2 — Buat Git Workspace dari repo
 **Opsi A — via Snowsight UI (disarankan):**
 1. Snowsight → **Projects → Workspaces → `+` (dropdown) → From Git repository**
